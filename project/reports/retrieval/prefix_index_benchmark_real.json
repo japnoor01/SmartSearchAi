@@ -1,0 +1,125 @@
+{
+  "limit_per_query": 100,
+  "warmup_iterations": 20,
+  "timed_iterations": 200,
+  "per_prefix": [
+    {
+      "prefix": "m",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 65.3071,
+      "p95_ms": 70.3461,
+      "p99_ms": 74.092,
+      "avg_ms": 65.7797,
+      "min_ms": 63.4542,
+      "max_ms": 77.835
+    },
+    {
+      "prefix": "ma",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 20.5579,
+      "p95_ms": 22.0743,
+      "p99_ms": 24.1939,
+      "avg_ms": 20.8163,
+      "min_ms": 19.9492,
+      "max_ms": 26.2934
+    },
+    {
+      "prefix": "mac",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 1.1392,
+      "p95_ms": 1.4142,
+      "p99_ms": 1.6145,
+      "avg_ms": 1.1762,
+      "min_ms": 1.1148,
+      "max_ms": 1.6831
+    },
+    {
+      "prefix": "machine",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 0.3588,
+      "p95_ms": 0.4002,
+      "p99_ms": 0.4951,
+      "avg_ms": 0.3673,
+      "min_ms": 0.353,
+      "max_ms": 0.6518
+    },
+    {
+      "prefix": "machine l",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 0.3257,
+      "p95_ms": 0.5464,
+      "p99_ms": 0.5956,
+      "avg_ms": 0.3649,
+      "min_ms": 0.3148,
+      "max_ms": 0.7682
+    },
+    {
+      "prefix": "machine lea",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 0.3293,
+      "p95_ms": 0.4976,
+      "p99_ms": 0.5846,
+      "avg_ms": 0.3497,
+      "min_ms": 0.3154,
+      "max_ms": 0.632
+    },
+    {
+      "prefix": "python",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 1.6294,
+      "p95_ms": 1.9186,
+      "p99_ms": 2.2982,
+      "avg_ms": 1.6741,
+      "min_ms": 1.5925,
+      "max_ms": 2.493
+    },
+    {
+      "prefix": "data",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 0.6899,
+      "p95_ms": 0.8068,
+      "p99_ms": 0.9823,
+      "avg_ms": 0.7066,
+      "min_ms": 0.6743,
+      "max_ms": 1.0238
+    },
+    {
+      "prefix": "deep",
+      "iterations": 200,
+      "result_count_last_run": 100,
+      "p50_ms": 0.5306,
+      "p95_ms": 0.6315,
+      "p99_ms": 0.7206,
+      "avg_ms": 0.5456,
+      "min_ms": 0.519,
+      "max_ms": 0.8867
+    },
+    {
+      "prefix": "xyznonexistent",
+      "iterations": 200,
+      "result_count_last_run": 0,
+      "p50_ms": 0.0776,
+      "p95_ms": 0.0897,
+      "p99_ms": 0.1077,
+      "avg_ms": 0.0801,
+      "min_ms": 0.0755,
+      "max_ms": 0.1396
+    }
+  ],
+  "overall": {
+    "p50_ms": 9.0945,
+    "p95_ms": 9.8725,
+    "p99_ms": 10.5685,
+    "avg_ms": 9.186,
+    "worst_p99_ms": 74.092,
+    "worst_p99_prefix": "m"
+  }
+}

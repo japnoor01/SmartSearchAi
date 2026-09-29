@@ -1,0 +1,113 @@
+# =============================================================================
+# SmartSearch AI -- prefix candidate-generation index configuration
+# =============================================================================
+# Consumed by:
+#   src/retrieval/build_prefix_index.py  (index build)
+#   src/retrieval/prefix_index.py        (query time, via PrefixIndex.from_config)
+#   src/retrieval/benchmark_prefix_index.py
+#
+# THIS IS THE PRODUCTION / REAL-DATA CONFIG. Defaults below build from the
+# real msmarco_web_search train split (9,206,475 processed queries,
+# data/processed/msmarco_web_search/train_queries.parquet) into
+# data/indexes/prefix_real/ -- a location distinct from, and never touched
+# by, the project's existing synthetic/demo index permanently kept at
+# data/indexes/prefix/ (see docs/prefix_index.md's "Two index locations"
+# section for why both exist and when to use each). build_prefix_index.py
+# also refuses, as a second line of defense, to write into
+# data/indexes/prefix/ unless --force is passed -- see its
+# _guard_against_overwriting_demo_index().
+#
+# See docs/prefix_index.md for the full rationale behind every value here.
+
+input:
+  # Output of the preprocessing stage (src/data/preprocess_queries.py).
+  # Schema (must match OUTPUT_SCHEMA in that module):
+  #   qid, original_query, normalized_query, language,
+  #   char_length_original, char_length_normalized, token_count,
+  #   normalization_changed
+  train_queries: data/processed/msmarco_web_search/train_queries.parquet
+  # dev_queries.parquet is the eval split -- it is never indexed.
+
+output:
+  # Real-data index location -- deliberately NOT data/indexes/prefix/,
+  # which holds the permanent synthetic/demo index. See header note above.
+  index_dir: data/indexes/prefix_real
+  sqlite_filename: prefix_index.sqlite3
+  build_report_filename: build_report.json
+
+processing:
+  # Parquet is read in Arrow record batches so memory stays flat regardless
+  # of file size (train_queries.parquet is ~540MB / 9.2M rows). The full
+  # file is never materialized as a Python list.
+  batch_size: 50000
+  # Rows are buffered and written to SQLite with executemany() in batches
+  # of this size, with a COMMIT after each batch (bounded transaction size,
+  # bounded memory, crash-safe resumability at batch granularity).
+  sqlite_commit_batch_size: 20000
+
+matching:
+  # Whether prefix matching -- and the `match_key` column built at index
+  # time -- is case-sensitive. Default false: "Machine" and "machine"
+  # should surface the same candidates, which is standard autocomplete UX.
+  # This only affects which rows a typed prefix matches; the *displayed*
+  # normalized_query / original_query always keep their original casing
+  # (preprocessing's case.mode was "none", so original casing is preserved
+  # end to end unless the user asks for case-sensitive matching).
+  case_sensitive: false
+  # Unicode normalization form applied to incoming user-typed prefixes at
+  # query time. MUST match the form used by preprocessing (NFKC) or prefix
+  # matching will silently miss rows whose stored form was folded.
+  unicode_form: "NFKC"
+
+prefix_generation:
+  # --- controls generate_prefixes(normalized_query) in prefix_index.py ---
+  # Shortest prefix ever generated/materialized. 1 = single-character
+  # prefixes are supported (e.g. "m").
+  min_prefix_length: 1
+  # Longest prefix generate_prefixes() will produce for a given query.
+  # This does NOT cap how long a prefix a user can type at query time --
+  # arbitrarily long typed prefixes are still served correctly via a
+  # range-scan over the sorted `queries` table (see docs/prefix_index.md,
+  # section A). It only bounds how many *materialized* prefix strings are
+  # produced per query during indexing.
+  max_prefix_length: 20
+  # Whether prefixes that end exactly on a whitespace boundary (e.g.
+  # "machine " for the query "machine learning tutorial") are generated.
+  # These matter for autocomplete: they fire the instant a user finishes a
+  # word and pauses, before they've typed anything of the next word.
+  include_whitespace_prefixes: true
+  # Hard cap on prefixes generated for a single query, independent of
+  # max_prefix_length. Protects against pathological long queries (the
+  # corpus has normalized queries up to 1,520 characters) generating
+  # excessive prefixes.
+  max_prefixes_per_query: 20
+
+hot_prefix_cache:
+  # Only prefixes up to this length get a materialized, pre-ranked
+  # top-K cache row in the `hot_prefix_cache` table. This is the fast path
+  # for the shortest, highest-QPS prefixes ("m", "ma", "machine l", ...).
+  # Must be <= prefix_generation.max_prefix_length. Longer prefixes (and
+  # any cache miss) fall back to the range-scan path, which is still O(log
+  # n) to seek plus a small forward scan -- correct and fast, just not a
+  # single indexed-row-range lookup.
+  max_length: 6
+  # How many top candidates (ranked by popularity, then normalized_query
+  # as a deterministic tie-break) are kept per cached prefix.
+  top_k: 50
+
+popularity:
+  # This dataset does NOT provide a true search-frequency / click signal.
+  # We do not fabricate one. Two honest, fully-documented options:
+  #   "neutral"          -> popularity = 1 for every query (flat signal;
+  #                          candidate order falls back entirely to the
+  #                          deterministic normalized_query tie-break).
+  #   "duplicate_count"  -> popularity = 1 + (count of OTHER raw qids whose
+  #                          normalized_query is byte-identical to this
+  #                          one). This is a real, derived-from-data count
+  #                          -- not invented -- but it is NOT a measure of
+  #                          how often the query was actually searched by
+  #                          a user. See docs/prefix_index.md section 4.
+  mode: "duplicate_count"
+
+logging:
+  level: "INFO"

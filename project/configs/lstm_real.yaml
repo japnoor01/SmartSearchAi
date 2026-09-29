@@ -1,0 +1,61 @@
+seed: 1337
+
+data:
+  train_queries: data/processed/msmarco_web_search/train_queries.parquet
+  dev_queries: data/processed/msmarco_web_search/dev_queries.parquet
+
+retrieval:
+  config_path: configs/retrieval_real.yaml
+
+training_pairs:
+  min_prefix_length: 1
+  max_prefix_length: 20
+  max_prefixes_per_query: 8
+  include_whitespace_prefixes: true
+  negatives_per_positive: 4
+  candidate_pool_size: 50
+  train_pairs_path: data/processed/lstm/train_pairs_clean.jsonl
+  dev_pairs_path: data/processed/lstm/dev_pairs.jsonl
+
+tokenizer:
+  mode: hybrid
+  lowercase: true
+  unicode_form: NFKC
+  max_vocab_size: 20000
+  max_char_vocab_size: 2000
+  min_frequency: 1
+  max_seq_length: 40
+  save_dir: models/lstm/tokenizer
+
+model:
+  embedding_dim: 128
+  hidden_dim: 256
+  num_layers: 1
+  dropout: 0.2
+  bidirectional: true
+  max_seq_length: 40
+
+train:
+  batch_size: 64
+  learning_rate: 0.001
+  optimizer: adamw
+  weight_decay: 0.01
+  epochs: 15
+  grad_clip_norm: 1.0
+  loss: bce
+  pairwise_margin: 0.3
+  early_stopping_patience: 3
+  early_stopping_metric: mrr@5
+  checkpoint_dir: models/lstm
+  best_checkpoint_name: best_model.pt
+  device: auto
+  num_workers: 0
+  log_every_n_steps: 50
+
+evaluate:
+  top_k: 5
+  candidate_pool_size: 50
+  latency_warmup_iters: 5
+  latency_timed_iters: 50
+  report_path: reports/models/lstm_training_report.json
+  baseline_comparison_path: reports/models/lstm_baseline_comparison.json

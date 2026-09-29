@@ -1,0 +1,60 @@
+# =============================================================================
+# SmartSearch AI -- Production Docker Compose Configuration
+# =============================================================================
+# Launches:
+#   1. smartsearch-api: FastAPI backend with CPU PyTorch LSTM model
+#   2. nginx: Reverse proxy with rate limits, timeout controls, and gzip
+#
+# STORAGE ARCHITECTURE NOTE:
+# The 3.48 GB SQLite prefix index is mounted as a read-only volume mount (:ro)
+# to keep the Docker image small and build times fast.
+
+services:
+  smartsearch-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartsearch-api
+    restart: unless-stopped
+    environment:
+      - SMARTSEARCH_ENV=${SMARTSEARCH_ENV:-production}
+      - SMARTSEARCH_HOST=0.0.0.0
+      - SMARTSEARCH_PORT=8000
+      - SMARTSEARCH_INDEX_PATH=/app/data/indexes/prefix_real/prefix_index.sqlite3
+      - SMARTSEARCH_MODEL_PATH=models/lstm/best_model.pt
+      - SMARTSEARCH_TOKENIZER_PATH=models/lstm/tokenizer
+      - SMARTSEARCH_DEVICE=${SMARTSEARCH_DEVICE:-cpu}
+      - SMARTSEARCH_CORS_ORIGINS=${SMARTSEARCH_CORS_ORIGINS:-http://localhost,http://localhost:8000,http://127.0.0.1,http://127.0.0.1:8000}
+      - SMARTSEARCH_RATE_LIMIT_ENABLED=${SMARTSEARCH_RATE_LIMIT_ENABLED:-true}
+      - SMARTSEARCH_RATE_LIMIT_REQUESTS=${SMARTSEARCH_RATE_LIMIT_REQUESTS:-120}
+      - SMARTSEARCH_RATE_LIMIT_WINDOW_SECONDS=${SMARTSEARCH_RATE_LIMIT_WINDOW_SECONDS:-60.0}
+      - SMARTSEARCH_REQUEST_TIMEOUT_SECONDS=${SMARTSEARCH_REQUEST_TIMEOUT_SECONDS:-5.0}
+      - SMARTSEARCH_LOG_LEVEL=${SMARTSEARCH_LOG_LEVEL:-INFO}
+      - SMARTSEARCH_LOG_QUERIES=${SMARTSEARCH_LOG_QUERIES:-false}
+      - SMARTSEARCH_SAFE_BROWSING_API_KEY=${SMARTSEARCH_SAFE_BROWSING_API_KEY:-}
+      - SMARTSEARCH_VIRUSTOTAL_API_KEY=${SMARTSEARCH_VIRUSTOTAL_API_KEY:-}
+      - SMARTSEARCH_TRUST_ENABLED=${SMARTSEARCH_TRUST_ENABLED:-true}
+
+    volumes:
+      # CRITICAL: Bind mount the 3.48 GB SQLite prefix index read-only (:ro)
+      - ./data/indexes/prefix_real:/app/data/indexes/prefix_real:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/readiness"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  nginx:
+    image: nginx:alpine
+    container_name: smartsearch-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      smartsearch-api:
+        condition: service_healthy

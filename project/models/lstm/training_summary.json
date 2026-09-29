@@ -1,0 +1,24 @@
+{
+  "total_training_seconds": 8.74,
+  "epochs_run": 1,
+  "best_metric": "mrr@5",
+  "best_metric_value": 0.5743,
+  "device": "cpu",
+  "trainable_parameters": 3606529,
+  "checkpoint_size_bytes": 14431029,
+  "checkpoint_path": "models\\lstm\\best_model.pt",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.466,
+      "epoch_train_seconds": 8.35,
+      "precision@1": 0.34,
+      "precision@5": 0.2,
+      "recall@5": 1.0,
+      "mrr@5": 0.5743,
+      "hit_rate@5": 1.0,
+      "avg_scoring_latency_ms": 7.2929,
+      "n_groups_evaluated": 50
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "mode": "lstm",
+  "n_prefixes_evaluated": 100,
+  "precision@1": 0.29,
+  "precision@5": 0.2,
+  "recall@5": 1.0,
+  "mrr@5": 0.5225,
+  "hit_rate@5": 1.0,
+  "latency_ms": {
+    "avg": 8.941,
+    "p50": 8.4109,
+    "p95": 11.525,
+    "n_samples": 100
+  }
+}

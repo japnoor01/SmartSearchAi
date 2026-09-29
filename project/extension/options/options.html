@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartSearch AI — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-layout">
+    <!-- Sidebar / Brand -->
+    <aside class="options-sidebar">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="SmartSearch Logo" class="brand-logo">
+        <div>
+          <h1 class="brand-title">SmartSearch AI</h1>
+          <span class="brand-badge">Extension v1.0.0</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#connection" class="nav-item active">Backend Connection</a>
+        <a href="#behavior" class="nav-item">Search Behavior</a>
+        <a href="#privacy" class="nav-item">Privacy &amp; Security</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p>Inspired by modern search suggestion architectures. Powered by PyTorch &amp; SQLite.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="options-main">
+      <header class="main-header">
+        <h2>Extension Settings</h2>
+        <p>Configure API connection parameters, request debouncing, and ranking limits.</p>
+      </header>
+
+      <form id="options-form">
+        <!-- Section 1: Backend Connection -->
+        <section id="connection" class="settings-card">
+          <h3 class="card-title">Backend Connection</h3>
+          <p class="card-desc">Specify the local or remote FastAPI server running the LSTM candidate ranker.</p>
+
+          <div class="form-group">
+            <label for="api-url">API Base URL</label>
+            <div class="input-with-button">
+              <input type="url" id="api-url" placeholder="http://localhost" required>
+              <button type="button" id="test-conn-btn" class="btn btn-secondary">Test Connection</button>
+            </div>
+            <span class="form-hint">Default local address: <code>http://localhost</code></span>
+          </div>
+
+          <div id="conn-result" class="conn-result" style="display: none;"></div>
+        </section>
+
+        <!-- Section 2: Autocomplete Behavior -->
+        <section id="behavior" class="settings-card">
+          <h3 class="card-title">Autocomplete Behavior</h3>
+          <p class="card-desc">Control search recommendation count and responsiveness.</p>
+
+          <div class="form-group toggle-row">
+            <div>
+              <label for="enable-toggle">Enable Autocomplete</label>
+              <p class="form-hint">Turn on/off real-time suggestions across supported search inputs.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="enable-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="top-k">Max Suggestions (Top-K)</label>
+              <input type="number" id="top-k" min="1" max="20" value="5" required>
+              <span class="form-hint">Between 1 and 20 candidates.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="debounce-ms">Debounce Delay (ms)</label>
+              <input type="number" id="debounce-ms" min="50" max="1000" step="50" value="200" required>
+              <span class="form-hint">Milliseconds to pause after keystrokes (150–300ms recommended).</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Privacy & Security -->
+        <section id="privacy" class="settings-card">
+          <h3 class="card-title">Privacy &amp; Security</h3>
+          <ul class="privacy-list">
+            <li><strong>Minimal Payload:</strong> Only the current active search prefix query is transmitted to the configured API.</li>
+            <li><strong>Exclusion of Sensitive Fields:</strong> Passwords, payment fields, credit cards, emails, OTPs, and private tokens are strictly ignored.</li>
+            <li><strong>Zero Tracking:</strong> No cookies, browser history, browsing telemetry, or personal identity information is ever collected or persisted.</li>
+          </ul>
+        </section>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" id="reset-btn" class="btn btn-outline">Reset to Defaults</button>
+          <span id="save-msg" class="save-msg" style="display: none;">Changes saved successfully!</span>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="../content/logic.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

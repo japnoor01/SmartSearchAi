@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartSearch AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="header-brand">
+        <img src="../icons/icon32.png" alt="Logo" class="header-logo">
+        <div>
+          <h1 class="header-title">SmartSearch AI</h1>
+          <span class="header-subtitle">Search Autocomplete</span>
+        </div>
+      </div>
+      <!-- Enable/Disable Switch -->
+      <label class="toggle-switch" title="Toggle Autocomplete">
+        <input type="checkbox" id="toggle-enabled" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </header>
+
+    <!-- Health Status Banner -->
+    <div id="status-banner" class="status-banner status-loading">
+      <span class="status-dot"></span>
+      <span id="status-text">Checking backend...</span>
+    </div>
+
+    <!-- Website Trust & Safety Check Section -->
+    <div id="trust-card" class="trust-card">
+      <div class="trust-header">
+        <div class="trust-title-row">
+          <span class="trust-title">🛡️ Website Safety Check</span>
+          <span id="trust-badge" class="trust-badge badge-loading">Checking...</span>
+        </div>
+        <div id="trust-domain-row" class="trust-domain-row">
+          <span class="trust-domain-label">Site:</span>
+          <span id="trust-domain-val" class="trust-domain-val" title="Active tab domain">—</span>
+        </div>
+      </div>
+
+      <div id="trust-signals-list" class="trust-signals-list">
+        <div id="signal-https" class="trust-signal-item">
+          <span class="signal-bullet">·</span>
+          <span class="signal-text">Checking HTTPS...</span>
+        </div>
+        <div id="signal-threat" class="trust-signal-item">
+          <span class="signal-bullet">·</span>
+          <span class="signal-text">Checking threat intelligence...</span>
+        </div>
+        <div id="signal-partner" class="trust-signal-item">
+          <span class="signal-bullet">·</span>
+          <span class="signal-text">Checking partner directory...</span>
+        </div>
+      </div>
+
+      <div id="trust-notice" class="trust-notice" style="display:none;"></div>
+    </div>
+
+    <!-- Quick Settings Form -->
+    <form id="settings-form" class="settings-form">
+
+      <div class="form-group">
+        <label for="api-url">API Base URL</label>
+        <input type="url" id="api-url" placeholder="http://localhost" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="top-k">Suggestions</label>
+          <input type="number" id="top-k" min="1" max="20" value="5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="debounce-ms">Debounce (ms)</label>
+          <input type="number" id="debounce-ms" min="50" max="1000" step="50" value="200" required>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button type="submit" id="save-btn" class="btn btn-primary">Save Settings</button>
+        <button type="button" id="options-btn" class="btn btn-secondary">Options</button>
+      </div>
+
+      <div id="save-feedback" class="save-feedback" style="display: none;">Settings saved!</div>
+    </form>
+  </div>
+
+  <script src="../content/logic.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

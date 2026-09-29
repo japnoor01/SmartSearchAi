@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartSearch AI — Local Extension Verification Page</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 26px;
+      font-weight: 700;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .card-title {
+      margin: 0 0 6px 0;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+    .badge-active {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .badge-ignored {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .field-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    input[type="text"],
+    input[type="search"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 15px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    .btn {
+      padding: 8px 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #4338ca;
+    }
+    #log-panel {
+      font-family: monospace;
+      font-size: 12px;
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 12px;
+      border-radius: 8px;
+      height: 120px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SmartSearch AI — Extension Test Page</h1>
+      <p>Use this page to verify input detection, debouncing, keyboard navigation, and sensitive field protection.</p>
+    </header>
+
+    <div id="connection-banner" style="display:none; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.5;"></div>
+
+    <!-- Test Case 1 -->
+    <div class="card">
+      <div class="card-title">
+        <span>1. Standard Search Field</span>
+        <span class="badge badge-active">Target: Active</span>
+      </div>
+      <p class="field-desc">An <code>&lt;input type="search"&gt;</code> element. Try typing <strong>"deep"</strong> or <strong>"machine"</strong>.</p>
+      <input type="search" id="search-1" placeholder="Type 'deep learning' or 'neural'..." autocomplete="off">
+    </div>
+
+    <!-- Test Case 2 -->
+    <div class="card">
+      <div class="card-title">
+        <span>2. Text Input with Query Parameter</span>
+        <span class="badge badge-active">Target: Active</span>
+      </div>
+      <p class="field-desc">An <code>&lt;input type="text" name="q"&gt;</code> mimicking Google/Bing search boxes.</p>
+      <input type="text" name="q" id="search-2" placeholder="Search Google-style query autocomplete..." autocomplete="off">
+    </div>
+
+    <!-- Test Case 3: Dynamic Search Field -->
+    <div class="card">
+      <div class="card-title">
+        <span>3. Dynamically Created Search Field</span>
+        <span class="badge badge-active">Target: Active (MutationObserver)</span>
+      </div>
+      <p class="field-desc">Click below to dynamically create a new search box into the DOM (tests SPA/React behavior).</p>
+      <button type="button" id="add-dynamic-btn" class="btn">Add Dynamic Search Input</button>
+      <div id="dynamic-container" style="margin-top: 14px;"></div>
+    </div>
+
+    <!-- Test Case 4: Non-Search Ordinary Input -->
+    <div class="card">
+      <div class="card-title">
+        <span>4. Generic Form Field</span>
+        <span class="badge badge-ignored">Target: Ignored</span>
+      </div>
+      <p class="field-desc">An ordinary non-search input (e.g. username). Extension should NOT trigger here.</p>
+      <input type="text" name="notes" placeholder="Enter random notes or bio...">
+    </div>
+
+    <!-- Test Case 5: Sensitive Password Input -->
+    <div class="card">
+      <div class="card-title">
+        <span>5. Password Field</span>
+        <span class="badge badge-ignored">Sensitive: Strictly Ignored</span>
+      </div>
+      <p class="field-desc"><code>&lt;input type="password"&gt;</code>. SmartSearch must NEVER attach to passwords.</p>
+      <input type="password" name="password" placeholder="Enter secret password...">
+    </div>
+
+    <!-- Test Case 6: Sensitive Email Input -->
+    <div class="card">
+      <div class="card-title">
+        <span>6. Email Field</span>
+        <span class="badge badge-ignored">Sensitive: Strictly Ignored</span>
+      </div>
+      <p class="field-desc"><code>&lt;input type="email"&gt;</code>. SmartSearch must NEVER attach to email addresses.</p>
+      <input type="email" name="email" placeholder="name@example.com">
+    </div>
+
+    <!-- Event Log -->
+    <div class="card">
+      <div class="card-title">
+        <span>Real-Time Input Event Log</span>
+        <span style="font-size: 11px; color: var(--muted);">Dispatched events</span>
+      </div>
+      <div id="log-panel">Ready. Type into a search box above to observe events...</div>
+    </div>
+  </div>
+
+  <script>
+    const logPanel = document.getElementById("log-panel");
+    function logEvent(type, target, value) {
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement("div");
+      line.textContent = `[${time}] ${type} on #${target.id || target.name || 'input'}: "${value}"`;
+      logPanel.appendChild(line);
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    document.querySelectorAll("input").forEach(input => {
+      input.addEventListener("input", (e) => logEvent("input", e.target, e.target.value));
+      input.addEventListener("change", (e) => logEvent("change", e.target, e.target.value));
+    });
+
+    // Dynamic search input creator
+    let dynamicCount = 0;
+    document.getElementById("add-dynamic-btn").addEventListener("click", () => {
+      dynamicCount++;
+      const container = document.getElementById("dynamic-container");
+      const wrapper = document.createElement("div");
+      wrapper.style.marginTop = "8px";
+      wrapper.innerHTML = `
+        <input type="search" id="dynamic-search-${dynamicCount}" name="search_dynamic"
+               placeholder="Dynamic search input #${dynamicCount}..." autocomplete="off">
+      `;
+      container.appendChild(wrapper);
+      const newEl = wrapper.querySelector("input");
+      newEl.addEventListener("input", (e) => logEvent("input", e.target, e.target.value));
+      newEl.addEventListener("change", (e) => logEvent("change", e.target, e.target.value));
+      newEl.focus();
+    });
+
+    // Extension diagnostic probe
+    setTimeout(() => {
+      const banner = document.getElementById("connection-banner");
+      const searchInput = document.getElementById("search-1");
+      const isAttached = searchInput && searchInput.dataset.smartsearchAttached === "true";
+      const isFileProtocol = window.location.protocol === "file:";
+
+      banner.style.display = "block";
+      if (isAttached) {
+        banner.style.background = "#ecfdf5";
+        banner.style.border = "1px solid #a7f3d0";
+        banner.style.color = "#065f46";
+        banner.innerHTML = "<strong>✅ SmartSearch Extension Connected:</strong> Content script successfully attached to search inputs. Autocomplete dropdown is active.";
+      } else {
+        banner.style.background = "#fffbeb";
+        banner.style.border = "1px solid #fde68a";
+        banner.style.color = "#92400e";
+        if (isFileProtocol) {
+          banner.innerHTML = `
+            <strong>⚠️ Extension Content Script Not Active:</strong>
+            <br>You are viewing this test page via local <code>file:///</code> protocol. Chromium/Brave blocks extensions on local files by default.
+            <ol style="margin: 6px 0 0 20px; padding: 0;">
+              <li>Go to <code>brave://extensions</code> (or <code>chrome://extensions</code>).</li>
+              <li>Click <strong>Details</strong> on <strong>SmartSearch AI</strong>.</li>
+              <li>Toggle <strong>"Allow access to file URLs"</strong> to <strong>ON</strong>.</li>
+              <li>Click the <strong>Reload (🔄)</strong> button on the extension card, then refresh this page.</li>
+            </ol>
+          `;
+        } else {
+          banner.innerHTML = `
+            <strong>⚠️ Extension Content Script Not Active:</strong>
+            <br>Ensure SmartSearch AI is loaded and enabled at <code>brave://extensions</code>, click the <strong>Reload (🔄)</strong> button, and refresh this page.
+          `;
+        }
+      }
+    }, 600);
+  </script>
+</body>
+</html>
+

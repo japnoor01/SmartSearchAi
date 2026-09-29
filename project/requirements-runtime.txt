@@ -1,0 +1,11 @@
+# =============================================================================
+# SmartSearch AI -- Production Runtime Dependencies (Container Serving)
+# =============================================================================
+# Note: PyTorch CPU wheel is installed directly via Dockerfile to optimize layer caching.
+# Build-time and test dependencies (pytest, pyarrow) are excluded from the runtime image.
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.9.0
+httpx>=0.28.0
+pyyaml>=6.0

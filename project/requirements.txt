@@ -1,0 +1,13 @@
+# Retrieval stage (src/retrieval/)
+pyarrow>=14.0
+pyyaml>=6.0
+pytest>=7.0
+
+# LSTM stage (src/models/lstm/) -- additional dependency
+torch>=2.1
+
+# API serving stage (src/api/)
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.9.0
+httpx>=0.28.0

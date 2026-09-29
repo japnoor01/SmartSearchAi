@@ -1,0 +1,10 @@
+{
+  "vocab_size": 21996,
+  "embedding_dim": 128,
+  "hidden_dim": 256,
+  "num_layers": 1,
+  "dropout": 0.2,
+  "bidirectional": true,
+  "max_seq_length": 40,
+  "pad_id": 0
+}

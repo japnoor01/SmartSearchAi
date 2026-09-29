@@ -1,0 +1,98 @@
+# =============================================================================
+# SmartSearch AI -- LSTM prefix/candidate ranking model configuration
+# =============================================================================
+# Consumed by:
+#   src/models/lstm/create_training_pairs.py
+#   src/models/lstm/train.py
+#   src/models/lstm/evaluate.py
+#   src/models/lstm/inference.py
+#
+# See docs/lstm_model.md for the full rationale behind these defaults and,
+# importantly, this environment's data-availability limitations (no real
+# train/dev parquet, no PyTorch installed -- see "Data & execution status").
+
+seed: 1337
+
+# ---------------------------------------------------------------------------
+# Data sources. These are the real preprocessed MS MARCO splits. Paths are
+# resolved from the project directory, where the generation commands run.
+# ---------------------------------------------------------------------------
+data:
+  train_queries: data/processed/msmarco_web_search/train_queries.parquet
+  dev_queries: data/processed/msmarco_web_search/dev_queries.parquet
+
+# The already-built, already-benchmarked prefix index (never rebuilt by
+# this stage -- see src/retrieval/, docs/prefix_index.md).
+retrieval:
+  config_path: configs/retrieval.yaml
+
+# ---------------------------------------------------------------------------
+# Training-pair generation (create_training_pairs.py)
+# ---------------------------------------------------------------------------
+training_pairs:
+  min_prefix_length: 1
+  max_prefix_length: 20
+  max_prefixes_per_query: 8
+  include_whitespace_prefixes: true
+  negatives_per_positive: 4
+  # How many candidates to pull from the prefix index per prefix before
+  # sampling negatives from them (task section 1 / section 9's realistic
+  # pipeline simulation both use this as the retrieval fan-out).
+  candidate_pool_size: 50
+  train_pairs_path: data/processed/lstm/train_pairs_clean.jsonl
+  dev_pairs_path: data/processed/lstm/dev_pairs.jsonl
+
+# ---------------------------------------------------------------------------
+# Tokenizer (tokenizer.py)
+# ---------------------------------------------------------------------------
+tokenizer:
+  mode: "hybrid"          # "hybrid" | "word" | "char"
+  lowercase: true
+  unicode_form: "NFKC"
+  max_vocab_size: 20000
+  max_char_vocab_size: 2000
+  min_frequency: 1
+  max_seq_length: 40
+  save_dir: models/lstm/tokenizer
+
+# ---------------------------------------------------------------------------
+# Model architecture (model.py)
+# ---------------------------------------------------------------------------
+model:
+  embedding_dim: 128
+  hidden_dim: 256
+  num_layers: 1
+  dropout: 0.2
+  bidirectional: true
+  max_seq_length: 40       # must match tokenizer.max_seq_length
+
+# ---------------------------------------------------------------------------
+# Training (train.py)
+# ---------------------------------------------------------------------------
+train:
+  batch_size: 64
+  learning_rate: 0.001
+  optimizer: "adamw"        # "adam" | "adamw"
+  weight_decay: 0.01
+  epochs: 15
+  grad_clip_norm: 1.0
+  loss: "bce"                # "bce" | "pairwise_hinge" -- see docs/lstm_model.md
+  pairwise_margin: 0.3        # only used when loss == "pairwise_hinge"
+  early_stopping_patience: 3
+  early_stopping_metric: "mrr@5"   # tracked on the dev pairs during training
+  checkpoint_dir: models/lstm
+  best_checkpoint_name: best_model.pt
+  device: "auto"              # "auto" | "cpu" | "cuda"
+  num_workers: 0
+  log_every_n_steps: 50
+
+# ---------------------------------------------------------------------------
+# Evaluation (evaluate.py)
+# ---------------------------------------------------------------------------
+evaluate:
+  top_k: 5
+  candidate_pool_size: 50    # candidates pulled per prefix from the prefix index
+  latency_warmup_iters: 5
+  latency_timed_iters: 50
+  report_path: reports/models/lstm_training_report.json
+  baseline_comparison_path: reports/models/lstm_baseline_comparison.json

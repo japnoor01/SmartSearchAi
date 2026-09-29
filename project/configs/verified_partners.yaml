@@ -1,0 +1,62 @@
+# =============================================================================
+# SmartSearch AI -- Verified Partner Directory
+# =============================================================================
+# Domains explicitly verified through direct organizational partnership or
+# established public trust records.
+#
+# PRIVACY & SAFETY PRINCIPLE:
+# A domain NOT in this list is simply "not verified" -- this MUST NEVER
+# be treated as evidence of fraud or illegitimacy.
+# =============================================================================
+
+version: "1.0"
+updated_at: "2026-09-29"
+
+partners:
+  - domain: "wikipedia.org"
+    organization: "Wikimedia Foundation"
+    category: "Encyclopedia & Reference"
+    verified_since: "2024-01-15"
+    allow_subdomains: true
+
+  - domain: "github.com"
+    organization: "GitHub / Microsoft"
+    category: "Software Development & Hosting"
+    verified_since: "2024-01-15"
+    allow_subdomains: true
+
+  - domain: "python.org"
+    organization: "Python Software Foundation"
+    category: "Open Source Software"
+    verified_since: "2024-02-01"
+    allow_subdomains: true
+
+  - domain: "google.com"
+    organization: "Google LLC"
+    category: "Search & Cloud Services"
+    verified_since: "2024-01-01"
+    allow_subdomains: true
+
+  - domain: "fastapi.tiangolo.com"
+    organization: "FastAPI Project"
+    category: "Software Documentation"
+    verified_since: "2024-03-01"
+    allow_subdomains: false
+
+  - domain: "huggingface.co"
+    organization: "Hugging Face"
+    category: "Machine Learning & AI Community"
+    verified_since: "2024-03-10"
+    allow_subdomains: true
+
+  - domain: "mozilla.org"
+    organization: "Mozilla Corporation"
+    category: "Web Platform & Browser"
+    verified_since: "2024-01-10"
+    allow_subdomains: true
+
+  - domain: "microsoft.com"
+    organization: "Microsoft Corporation"
+    category: "Technology & Software"
+    verified_since: "2024-01-01"
+    allow_subdomains: true

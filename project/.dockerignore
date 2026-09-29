@@ -1,0 +1,49 @@
+# =============================================================================
+# SmartSearch AI -- Docker Ignore
+# =============================================================================
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Git and IDE metadata
+.git/
+.gitignore
+.gitattributes
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# CRITICAL: Exclude large data directory (3.48 GB SQLite prefix index and raw data)
+# The prefix index must be mounted via Docker volume at runtime, NOT baked into the image.
+data/
+
+# Frontend / Extension (client-side Chrome extension code)
+extension/
+node_modules/
+
+# Test suites and development scripts
+tests/
+*.bat
+*.ps1
+
+# Documentation and temporary files
+docs/
+*.md
+!README.md
+*.log
+scratch/
+tmp/
