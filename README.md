@@ -124,6 +124,19 @@ pip install -r requirements.txt
 uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
 ```
 
+### Option C: Share with Anyone via Cloudflare Tunnel (Free HTTPS)
+
+Expose your local server to the public internet securely without port forwarding or a domain:
+
+```powershell
+# Run the tunnel launcher:
+.\project\start_tunnel.ps1
+
+# Or double-click project\start_tunnel.bat in Windows Explorer
+```
+
+Copy the generated `https://xxx.trycloudflare.com` URL into your Chrome Extension's popup under **API Base URL**. Anyone with your extension can now connect from any browser or network in the world! See [`project/docs/cloudflare_tunnel.md`](project/docs/cloudflare_tunnel.md) for custom domain setup.
+
 ### Load the Extension in Chrome / Chromium
 
 1. Open **Google Chrome** (or Edge / Brave).

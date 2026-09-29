@@ -58,3 +58,15 @@ services:
     depends_on:
       smartsearch-api:
         condition: service_healthy
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: smartsearch-tunnel
+    restart: unless-stopped
+    command: ${CLOUDFLARE_TUNNEL_COMMAND:---no-autoupdate --url http://nginx:80}
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - nginx
+    profiles:
+      - tunnel
