@@ -27,21 +27,29 @@ try {
 Write-Host "`n[1/3] Ensuring SmartSearch API & Nginx are running..." -ForegroundColor Yellow
 docker compose up -d nginx smartsearch-api
 
-# 3. Launch cloudflared tunnel
-Write-Host "`n[2/3] Starting Cloudflare Tunnel container..." -ForegroundColor Yellow
-docker compose --profile tunnel up -d cloudflared
+# 3. Launch or refresh cloudflared tunnel
+Write-Host "`n[2/3] Connecting Cloudflare Tunnel to local Nginx proxy..." -ForegroundColor Yellow
+$tunnelRunning = docker ps --filter "name=smartsearch-tunnel" --filter "status=running" -q
+if ($tunnelRunning) {
+    docker compose --profile tunnel restart cloudflared
+} else {
+    docker compose --profile tunnel up -d cloudflared
+}
 
-Write-Host "Waiting 5 seconds for Cloudflare edge registration..." -ForegroundColor Gray
-Start-Sleep -Seconds 6
+Write-Host "Waiting for Cloudflare edge registration..." -ForegroundColor Gray
+$matchedUrl = $null
+for ($i = 0; $i -lt 10; $i++) {
+    Start-Sleep -Seconds 2
+    $logRaw = (docker logs --tail 40 smartsearch-tunnel 2>&1) | Out-String
+    $allMatches = [regex]::Matches($logRaw, 'https://[a-zA-Z0-9-]+\.trycloudflare\.com')
+    if ($allMatches.Count -gt 0) {
+        $matchedUrl = $allMatches[$allMatches.Count - 1].Value
+        break
+    }
+}
 
 # 4. Extract public URL from logs
 Write-Host "`n[3/3] Retrieving your public HTTPS endpoint..." -ForegroundColor Yellow
-$logRaw = (docker logs smartsearch-tunnel 2>&1) | Out-String
-
-$matchedUrl = $null
-if ($logRaw -match "(https://[a-zA-Z0-9-]+\.trycloudflare\.com)") {
-    $matchedUrl = $Matches[1]
-}
 
 Write-Host "`n==========================================================" -ForegroundColor Green
 if ($matchedUrl) {

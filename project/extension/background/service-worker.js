@@ -28,7 +28,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 // Message listener for popup/options connectivity checks & content script suggestion fetches
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "CHECK_HEALTH") {
+  const action = message && (message.action || message.type);
+
+  if (action === "CHECK_HEALTH") {
     const apiBaseUrl = message.apiBaseUrl || DEFAULT_CONFIG.apiBaseUrl;
     fetch(`${apiBaseUrl}/health`, { method: "GET" })
       .then(async (res) => {
@@ -45,7 +47,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
 
-  if (message.action === "FETCH_SUGGESTIONS") {
+  if (action === "FETCH_SUGGESTIONS") {
     fetch(message.url, {
       method: "GET",
       headers: { Accept: "application/json" },
@@ -64,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
 
-  if (message.action === "CHECK_SITE_TRUST") {
+  if (action === "CHECK_SITE_TRUST") {
     const apiBaseUrl = message.apiBaseUrl || DEFAULT_CONFIG.apiBaseUrl;
     const cleanBase = apiBaseUrl.replace(/\/+$/, "");
     const targetUrl = `${cleanBase}/api/v1/site-check?url=${encodeURIComponent(message.url)}`;
