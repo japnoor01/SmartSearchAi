@@ -349,7 +349,10 @@
         const response = await fetch(url, {
           method: "GET",
           signal: currentAbortController.signal,
-          headers: { Accept: "application/json" },
+          headers: {
+            Accept: "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
         });
 
         if (!response.ok) {

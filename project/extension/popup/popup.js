@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const DEFAULT_SETTINGS = {
     enabled: true,
-    apiBaseUrl: "http://localhost",
+    apiBaseUrl: "https://japnoor69-smartsearch-api.hf.space",
     topK: 5,
     debounceMs: 200,
   };
@@ -45,10 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
   async function checkBackendHealth(baseUrl) {
     statusBanner.className = "status-banner status-loading";
     statusText.textContent = "Connecting to FastAPI...";
-
     const cleanUrl = (baseUrl || DEFAULT_SETTINGS.apiBaseUrl).replace(/\/+$/, "");
     try {
-      const response = await fetch(`${cleanUrl}/health`, { method: "GET" });
+      const response = await fetch(`${cleanUrl}/health`, {
+        method: "GET",
+        headers: { "ngrok-skip-browser-warning": "true" },
+      });
       if (response.ok) {
         const data = await response.json();
         statusBanner.className = "status-banner status-online";

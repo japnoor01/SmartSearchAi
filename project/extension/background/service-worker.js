@@ -8,7 +8,7 @@
 
 const DEFAULT_CONFIG = {
   enabled: true,
-  apiBaseUrl: "http://localhost",
+  apiBaseUrl: "https://japnoor69-smartsearch-api.hf.space",
   topK: 5,
   debounceMs: 200,
 };
@@ -32,7 +32,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (action === "CHECK_HEALTH") {
     const apiBaseUrl = message.apiBaseUrl || DEFAULT_CONFIG.apiBaseUrl;
-    fetch(`${apiBaseUrl}/health`, { method: "GET" })
+    fetch(`${apiBaseUrl}/health`, {
+      method: "GET",
+      headers: { "ngrok-skip-browser-warning": "true" },
+    })
       .then(async (res) => {
         if (!res.ok) {
           sendResponse({ ok: false, status: res.status });
@@ -50,7 +53,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (action === "FETCH_SUGGESTIONS") {
     fetch(message.url, {
       method: "GET",
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -73,7 +79,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     fetch(targetUrl, {
       method: "GET",
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
     })
       .then(async (res) => {
         if (!res.ok) {
