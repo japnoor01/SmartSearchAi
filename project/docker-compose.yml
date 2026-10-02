@@ -70,3 +70,16 @@ services:
       - nginx
     profiles:
       - tunnel
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: smartsearch-ngrok
+    restart: unless-stopped
+    command:
+      - "http"
+      - "--domain=${NGROK_DOMAIN:-emphatic-tackle-monetary.ngrok-free.dev}"
+      - "nginx:80"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      - nginx
