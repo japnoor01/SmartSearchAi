@@ -71,7 +71,7 @@ if ($domain) {
     Write-Host "2. Click 'Save Settings' in popup."
     Write-Host "3. Keep this window open while using the extension!`n" -ForegroundColor Gray
 
-    & ".\ngrok.exe" http 80 --domain=$domain
+    & ".\ngrok.exe" http --domain=$domain 80
 } else {
     Write-Host "Launching tunnel with automatic public URL..." -ForegroundColor Gray
     & ".\ngrok.exe" http 80

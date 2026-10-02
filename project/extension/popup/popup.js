@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const DEFAULT_SETTINGS = {
     enabled: true,
-    apiBaseUrl: "https://japnoor69-smartsearch-api.hf.space",
+    apiBaseUrl: "https://emphatic-tackle-monetary.ngrok-free.dev",
     topK: 5,
     debounceMs: 200,
   };
