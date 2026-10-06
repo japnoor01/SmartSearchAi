@@ -10,11 +10,21 @@ Separates development and production configuration cleanly.
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+try:
+    from dotenv import load_dotenv
+
+    # Do not let .env override environment during pytest test runs
+    if "pytest" not in sys.modules and "unittest" not in sys.modules and "SMARTSEARCH_ENV" not in os.environ:
+        load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+except ImportError:
+    pass
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -185,13 +195,24 @@ class APIConfig:
         cors_regex_env = os.environ.get("SMARTSEARCH_CORS_ORIGIN_REGEX")
 
         if env in ("production", "prod"):
-            # Production: strict allowlist only (no extension or null wildcards unless explicitly set)
+            # Production: explicit allowlist including configured ngrok domain and Chrome extension regex
             if cors_env:
                 cors_origins = [o.strip() for o in cors_env.split(",") if o.strip()]
             else:
-                cors_origins = cors_cfg.get("production_origins", [])
+                cors_origins = list(cors_cfg.get("production_origins", ["http://localhost:8000", "http://127.0.0.1:8000"]))
+
+            # Automatically include configured ngrok domain if present
+            ngrok_domain = os.environ.get("NGROK_DOMAIN", "").strip()
+            if ngrok_domain:
+                clean_ngrok = ngrok_domain.replace("https://", "").replace("http://", "").rstrip("/")
+                https_origin = f"https://{clean_ngrok}"
+                if https_origin not in cors_origins:
+                    cors_origins.append(https_origin)
+
             cors_origin_regex = (
-                cors_regex_env if cors_regex_env is not None else cors_cfg.get("production_origin_regex", None)
+                cors_regex_env
+                if cors_regex_env is not None
+                else cors_cfg.get("production_origin_regex", None)
             )
         else:
             # Development / Testing: allow local browser, extension, and null file origins

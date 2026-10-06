@@ -16,7 +16,7 @@
   // Global singleton configuration (defaults overridden from chrome.storage)
   const config = {
     enabled: true,
-    apiBaseUrl: "http://localhost",
+    apiBaseUrl: "https://emphatic-tackle-monetary.ngrok-free.dev",
     topK: 5,
     debounceMs: 200,
   };

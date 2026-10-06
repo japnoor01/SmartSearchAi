@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
         statusBanner.className = "status-banner status-online";
         statusText.textContent = `FastAPI Online (${(data.device || "CPU").toUpperCase()})`;
+      } else if (response.status === 404 && cleanUrl.includes("ngrok")) {
+        statusBanner.className = "status-banner status-offline";
+        statusText.textContent = "Ngrok Offline (HTTP 404 - Start Backend)";
       } else {
         statusBanner.className = "status-banner status-offline";
         statusText.textContent = `Backend Error (HTTP ${response.status})`;

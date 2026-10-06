@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const DEFAULTS = {
     enabled: true,
-    apiBaseUrl: "http://localhost",
+    apiBaseUrl: "https://emphatic-tackle-monetary.ngrok-free.dev",
     topK: 5,
     debounceMs: 200,
   };
@@ -42,13 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const t0 = performance.now();
     try {
-      const response = await fetch(`${url}/health`, { method: "GET" });
+      const response = await fetch(`${url}/health`, {
+        method: "GET",
+        headers: { "ngrok-skip-browser-warning": "true" },
+      });
       const elapsed = Math.round(performance.now() - t0);
 
       if (response.ok) {
         const data = await response.json();
         connResult.className = "conn-result success";
         connResult.textContent = `✓ Connected successfully (${elapsed}ms)! Model: LSTM Ranker (${data.device.toUpperCase()}), Status: ${data.status}.`;
+      } else if (response.status === 404 && url.includes("ngrok")) {
+        connResult.className = "conn-result error";
+        connResult.textContent = `✗ Ngrok tunnel offline (HTTP 404 - ERR_NGROK_3200). Run run_background.vbs on your PC to start the tunnel.`;
       } else {
         connResult.className = "conn-result error";
         connResult.textContent = `✗ Server responded with HTTP ${response.status}: ${response.statusText}.`;

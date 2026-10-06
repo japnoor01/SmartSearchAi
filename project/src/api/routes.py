@@ -116,6 +116,27 @@ def check_rate_limit(
 
 
 @router.get(
+    "/",
+    summary="Root service status",
+    description="Root status endpoint confirming the SmartSearch AI service is online.",
+    tags=["Monitoring"],
+    responses={
+        200: {"description": "Service is online."},
+    },
+)
+def root_status() -> dict[str, str]:
+    return {
+        "service": "SmartSearch AI API",
+        "status": "online",
+        "version": "1.0.0",
+        "docs_url": "/docs",
+        "health_url": "/health",
+        "suggestions_url": "/api/v1/suggestions",
+        "site_check_url": "/api/v1/site-check",
+    }
+
+
+@router.get(
     "/health",
     response_model=HealthResponse,
     summary="Liveness probe",
