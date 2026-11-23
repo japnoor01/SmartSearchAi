@@ -24,6 +24,9 @@ logs/
 
 # Binaries & scratch
 ngrok.exe
+*.exe
+*.zip
+*.gz
 scratch/
 .env
 data/indexes/prefix_real/*.sqlite3

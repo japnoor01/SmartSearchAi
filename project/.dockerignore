@@ -47,3 +47,11 @@ docs/
 *.log
 scratch/
 tmp/
+reports/
+
+# Binary executables, archives and tunnel artifacts
+ngrok.exe
+*.exe
+*.zip
+*.gz
+
